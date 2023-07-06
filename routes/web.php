@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\{AuthController, ProfileController, UserController};
+use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,9 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', function () {
-    return view('login');
+    return view('admin/auth/login');
 });
 
 Route::get('/admin/login', [AuthController::class, 'getLogin'])->name('getLogin');
 Route::post('/admin/login', [AuthController::class, 'postLogin'])->name('postLogin');
-Route::get('/admin/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
+Route::group(['middleware' => ['admin_auth']], function () {
+    Route::get('/admin/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
+    Route::get('/admin/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/admin/logout', [ProfileController::class, 'logout'])->name('logout');
+});

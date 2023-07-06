@@ -7,7 +7,14 @@ use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    public function dashboard(){
-        return view('admin.auth.dashboard');
+    public function dashboard()
+    {
+        $data = ['title' => 'Dashboard'];
+        return view('admin.auth.dashboard', $data);
+    }
+    public function logout()
+    {
+        auth()->logout();
+        return redirect()->route('getLogin')->with('success', 'Your have been successfully logout');
     }
 }
