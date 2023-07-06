@@ -22,8 +22,14 @@ Route::get('/', function () {
 
 Route::get('/admin/login', [AuthController::class, 'getLogin'])->name('getLogin');
 Route::post('/admin/login', [AuthController::class, 'postLogin'])->name('postLogin');
-Route::group(['middleware' => ['admin_auth']], function () {
-    Route::get('/admin/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
-    Route::get('/admin/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/admin/logout', [ProfileController::class, 'logout'])->name('logout');
+
+// Route::get('/dashboard', 'ProfileController@dashboard')->name('dashboard');
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin',  'middleware' => ['admin_auth']], function () {
+
+    Route::get('dashboard', 'ProfileController@dashboard')->name('dashboard');
+    Route::resource('users', 'UserController');
+    Route::resource('customers', 'CustomerController');
 });
+
+Route::get('/logout', [ProfileController::class, 'logout'])->name('logout');

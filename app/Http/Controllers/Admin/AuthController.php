@@ -23,7 +23,7 @@ class AuthController extends Controller
             'is_admin' => 1
         ], $request->password);
         if ($validated) {
-            return redirect()->route('dashboard')->with("success", "Login Successfully");
+            return redirect('/admin/dashboard')->with("success", "Login Successfully");
         } else {
             return redirect()->back()->with("error", "Invalid email or password");
         }

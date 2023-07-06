@@ -28,7 +28,7 @@
         @if(session('success'))
         <div class="text-success text-center">{{session('success')}}</div>
         @endif
-      <p class="login-box-msg">Sign in to start </p>
+      <p class="login-box-msg">Sign in to start  </p>
 
       <form action="{{route('postLogin')}}" method="post">
         @csrf
