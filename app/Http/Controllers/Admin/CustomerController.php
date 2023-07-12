@@ -40,7 +40,28 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //validation
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customers,email|max:255',
+            'address' => 'required|string',
+
+            'mobile_no'  =>  'required|numeric',
+
+            'pincode'  => 'required|numeric',
+
+            'ur_image'  =>  'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            // other validation rules
+        ]);
+        if ($request->hasFile('ur_image')) {
+            $imageName = time() . '.' . $request->ur_image->extension();
+            $request->ur_image->move(public_path('customer'), $imageName);
+            $request->merge(['image' => $imageName]);
+        }
+
+
+        $customer = Customer::create($request->all());
+        return redirect()->back()->route('admin.customers.index')->withSuccess('Customer created successfully!!!!!');
     }
 
     /**
@@ -62,7 +83,7 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        //
+        return  view('admin.customers.edit', compact('customer'));
     }
 
     /**
@@ -72,9 +93,40 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, $id)
     {
-        //
+        // Validation
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'address' => 'required|string',
+            'mobile_no' => 'required|numeric',
+            'pincode' => 'required|numeric',
+            'ur_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            // Other validation rules
+        ]);
+
+        $customer = Customer::where('id', $id)->first();
+
+        if ($request->hasFile('ur_image')) {
+            $imageName = time() . '.' . $request->ur_image->extension();
+            $request->ur_image->move(public_path('customer'), $imageName);
+            $request->merge(['image' => $imageName]);
+            $customer->image = $request->image;
+        }
+
+        // Update customer details
+
+        $customer->name = $request->name;
+        $customer->email = $request->email;
+        $customer->address = $request->address;
+        $customer->mobile_no = $request->mobile_no;
+        $customer->pincode = $request->pincode;
+
+        $customer->save();
+
+        // return redirect()->back()->withSuccess('Customer updated !!!!!');
+        return redirect()->route('admin.customers.index')->withSuccess('Customer updated successfully!');
     }
 
     /**
@@ -83,8 +135,17 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy(Request $request, $id)
     {
-        //
+        $customer = Customer::findOrFail($id);
+
+        // Remove customer image if exists
+        if ($customer->image && file_exists(public_path('customer/' . $customer->image))) {
+            unlink(public_path('customer/' . $customer->image));
+        }
+
+        $customer->delete();
+
+        return redirect()->back()->withSuccess('Customer deleted successfully!');
     }
 }

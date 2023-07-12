@@ -30,6 +30,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin',  'm
     Route::get('dashboard', 'ProfileController@dashboard')->name('dashboard');
     Route::resource('users', 'UserController');
     Route::resource('customers', 'CustomerController');
+    // Route::delete('customers/{id}/delete', 'CustomerController');
 });
 
 Route::get('/logout', [ProfileController::class, 'logout'])->name('logout');
